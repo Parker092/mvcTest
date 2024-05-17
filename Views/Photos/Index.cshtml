@@ -1,0 +1,109 @@
+﻿@model List<mvcTest.Models.Photo>
+
+<h1>Photo Gallery</h1>
+
+<div class="photo-gallery">
+    @foreach (var photo in Model)
+    {
+        <div class="photo-item">
+            <div class="photo-title">@photo.Title</div>
+            <div class="photo-url"><a href="@photo.Url" target="_blank">View Image</a></div>
+            <div class="photo-thumbnail">
+                <img src="@photo.ThumbnailUrl" alt="Thumbnail" />
+            </div>
+        </div>
+    }
+</div>
+
+<div class="pagination-controls">
+    <form method="get" action="@Url.Action("Index")">
+        <label for="itemsPerPage">Items per page:</label>
+        <select id="itemsPerPage" name="pageSize" onchange="this.form.submit()">
+            <option value="3">3</option>
+            <option value="6">6</option>
+            <option value="9">9</option>
+        </select>
+    </form>
+
+    <div class="page-links">
+        @{
+            int currentPage = ViewBag.CurrentPage;
+            int totalPages = ViewBag.TotalPages;
+            int startPage = Math.Max(1, currentPage - 2); // Ajusta esto para cambiar el rango visible
+            int endPage = Math.Min(totalPages, startPage + 5); // Asegura que siempre haya 6 páginas, ajusta según necesidad
+
+            // Corrección si estamos en las primeras o últimas páginas
+            if (endPage - startPage < 5)
+            {
+                startPage = Math.Max(1, endPage - 5);
+            }
+
+            for (int i = startPage; i <= endPage; i++)
+            {
+                <a class="@(i == currentPage ? "selected-page" : "")" href="@Url.Action("Index", new { page = i, pageSize = ViewBag.PageSize })">@i</a>
+            }
+
+            if (endPage < totalPages)
+            {
+                <a href="@Url.Action("Index", new { page = endPage + 1, pageSize = ViewBag.PageSize })">Next</a>
+            }
+
+            if (startPage > 1)
+            {
+                <a href="@Url.Action("Index", new { page = startPage - 1, pageSize = ViewBag.PageSize })">Prev</a>
+            }
+        }
+    </div>
+</div>
+
+
+
+<style>
+    .photo-gallery {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+
+    .photo-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        padding: 10px;
+        border-bottom: 1px solid #ccc;
+    }
+
+    .photo-title, .photo-url {
+        flex-basis: 30%; /* Adjust width as necessary */
+        text-align: left;
+    }
+
+    .photo-thumbnail {
+        flex-basis: 40%;
+    }
+
+        .photo-thumbnail img {
+            width: 100px; /* Adjust thumbnail size as necessary */
+            height: auto;
+        }
+
+    .pagination-controls {
+        text-align: center;
+        width: 100%;
+        margin-top: 20px;
+    }
+
+    .page-links a {
+        margin-right: 5px;
+        padding: 5px;
+        text-decoration: none;
+        color: #000;
+        font-weight: bold;
+    }
+
+    .selected-page {
+        color: red;
+    }
+</style>
